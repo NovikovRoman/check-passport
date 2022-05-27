@@ -61,8 +61,7 @@ if ok {
 ### Проверка паспорта
 
 ```go
-// context необязателен, можно отправить nil
-if ok, err = dbPassports.IsValid(ctx); err != nil {
+if ok, err = dbPassports.IsValid("9723", "123456"); err != nil {
     log.Fataln(err)
 }
 
