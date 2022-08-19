@@ -1,54 +1,87 @@
 package check_passport
 
 import (
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
+
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_Update(t *testing.T) {
-	ok, numPassports, err := testDB.Update(nil)
+	var (
+		err          error
+		ok           bool
+		numPassports int
+	)
+
+	_ = os.RemoveAll(testDst)
+
+	err = emulOldDB(testDst, 10000)
+	require.Nil(t, err)
+
+	testDB := NewDB(testDst, nil)
+	ok, numPassports, err = testDB.Update(nil)
 	require.Nil(t, err)
 	assert.True(t, ok)
 	assert.Greater(t, numPassports, 0)
 
-	err = os.Remove(filepath.Join(testDst, infoFile))
+	symlink := filepath.Join(testDst, symlinkCurrent)
+
+	var dir string
+	dir, err = os.Readlink(symlink)
 	require.Nil(t, err)
+	require.NotEqual(t, dir, dirName+strconv.Itoa(10000))
+
+	_ = os.RemoveAll(testDst)
 }
 
 func Test_UpdateAvailable(t *testing.T) {
-	setupForTest()
+	var (
+		ok           bool
+		numPassports int
+		err          error
+	)
 
-	ok, numPassports, err := testDB.UpdateAvailable(nil, testDst)
+	_ = os.RemoveAll(testDst)
+
+	testDB := NewDB(testDst, nil)
+	ok, numPassports, err = testDB.UpdateAvailable(nil, testDst)
 	require.Nil(t, err)
 	require.Greater(t, numPassports, 0)
 	require.True(t, ok)
 
-	fp := filepath.Join(testDst, infoFile)
-	_ = ioutil.WriteFile(fp, []byte("10000"), os.ModePerm)
-	ok, _, err = testDB.UpdateAvailable(nil, testDst)
-	assert.Nil(t, err)
-	assert.True(t, ok)
+	err = emulOldDB(testDst, 10000)
+	require.Nil(t, err)
 
-	_ = ioutil.WriteFile(fp, []byte(strconv.Itoa(numPassports)), os.ModePerm)
+	ok, numPassports, err = testDB.UpdateAvailable(nil, testDst)
+	require.Nil(t, err)
+	require.Greater(t, numPassports, 0)
+	require.True(t, ok)
+
+	_ = os.RemoveAll(testDst)
+	err = emulOldDB(testDst, numPassports)
+	require.Nil(t, err)
+
 	ok, _, err = testDB.UpdateAvailable(nil, testDst)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	assert.False(t, ok)
 
-	err = os.Remove(fp)
-	require.Nil(t, err)
+	_ = os.RemoveAll(testDst)
 }
 
 func Test_downloadFile(t *testing.T) {
-	setupForTest()
+	_ = os.RemoveAll(testDst)
 
+	testDB := NewDB(testDst, nil)
 	err := os.MkdirAll(testDst, dirPermission)
 	require.Nil(t, err)
 
 	err = testDB.downloadFile(nil, filepath.Join(testDst, archiveName), archiveUrl)
 	require.Nil(t, err)
+
+	_ = os.RemoveAll(testDst)
 }

@@ -50,7 +50,8 @@ func (db *DB) Update(ctx context.Context) (ok bool, numPassports int, err error)
 
 	_ = os.Remove(src)
 
-	err = ioutil.WriteFile(filepath.Join(db.dst, infoFile), []byte(strconv.Itoa(numPassports)), os.ModePerm)
+	err = ioutil.WriteFile(
+		filepath.Join(db.dst, infoFile), []byte(strconv.Itoa(numPassports)), os.ModePerm)
 	if err != nil {
 		return
 	}

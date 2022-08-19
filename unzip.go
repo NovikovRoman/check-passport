@@ -33,18 +33,12 @@ func (db *DB) Unzip(src, dst string) (err error) {
 	}()
 
 	cache := NewDataCache()
-
 	buf = bufio.NewReader(f)
 	reader = bufio.NewReader(bzip2.NewReader(buf))
 	scanner = bufio.NewScanner(reader)
-	first := true
+	scanner.Scan() // пропуск заголовков
 
 	for scanner.Scan() {
-		if first {
-			first = false
-			continue
-		}
-
 		m := rePassport.FindStringSubmatch(scanner.Text())
 		if len(m) != 3 {
 			continue

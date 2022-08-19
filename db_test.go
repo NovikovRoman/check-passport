@@ -53,7 +53,7 @@ func TestDB_IsValid(t *testing.T) {
 		},
 	}
 
-	db := NewDB(testDst, nil)
+	db := NewDB(testData, nil)
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
