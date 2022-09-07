@@ -41,7 +41,7 @@ func Test_sortNumbers(t *testing.T) {
 	err = sortNumbers(testDst)
 	require.Nil(t, err)
 
-	sort.Sort(sort.IntSlice(data))
+	sort.Ints(data)
 	bufSort, err = getBytes(data)
 	require.Nil(t, err)
 

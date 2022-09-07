@@ -2,7 +2,17 @@ package check_passport
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
+
+func TestDB_Exists(t *testing.T) {
+	db := NewDB(testData+"-not-found", nil)
+	assert.False(t, db.Exists())
+
+	db = NewDB(testData, nil)
+	assert.True(t, db.Exists())
+}
 
 func TestDB_IsValid(t *testing.T) {
 	type args struct {

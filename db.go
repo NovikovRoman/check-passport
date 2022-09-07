@@ -41,6 +41,13 @@ func NewDB(dst string, transport *http.Transport) (db *DB) {
 	return
 }
 
+//Exists существовует ли БД
+func (db *DB) Exists() bool {
+	symlink := filepath.Join(db.dst, symlinkCurrent)
+	_, err := os.Stat(symlink)
+	return err == nil
+}
+
 //AllowableSeries допустимая серия паспорта
 func (db *DB) AllowableSeries(series string) (ok bool) {
 	if ok = reAllowableSeries.MatchString(series); !ok {

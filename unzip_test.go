@@ -1,6 +1,7 @@
 package check_passport
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"testing"
@@ -16,7 +17,8 @@ func Test_Unzip(t *testing.T) {
 	err := os.MkdirAll(testDst, dirPermission)
 	require.Nil(t, err)
 
-	err = testDB.downloadFile(nil, filepath.Join(testDst, archiveName), archiveUrl)
+	ctx := context.Background()
+	err = testDB.downloadFile(ctx, filepath.Join(testDst, archiveName), archiveUrl)
 	require.Nil(t, err)
 
 	err = testDB.Unzip(filepath.Join(testDst, archiveName), testDst)
